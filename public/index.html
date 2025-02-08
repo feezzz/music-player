@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐浏览器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-content">
+        <header class="header">
+            <h1 class="header__title">欢迎来到 <span class="highlight">音乐探索</span></h1>
+            <p class="header__subtitle">发现属于你的音乐世界</p>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="搜索歌曲..." class="search-input">
+                <button id="search-button" class="search-button">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- 添加搜索结果区域 -->
+            <div class="search-results" id="search-results">
+                <div class="search-results__header">
+                    <h2 class="search-results__title">搜索结果</h2>
+                    <span class="search-results__count"></span>
+                </div>
+                <div class="search-results__list"></div>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- 左侧音乐浏览器 -->
+            <div class="music-explorer">
+                <!-- 添加轨迹路径 -->
+                <div class="orbit-path">
+                    <div class="orbit-trail"></div>
+                    <div class="orbit-tracker"></div>
+                </div>
+                <div id="circle" class="song-arc">
+                    <div class="circle-ripple"></div>
+                    <div class="circle-center"></div>
+                </div>
+            </div>
+
+            <!-- 右侧播放器和歌词 -->
+            <div class="player-section">
+                <!-- 左侧播放器和歌词 -->
+                <div class="player-lyrics-container">
+                    <div class="music-player">
+                        <!-- 音乐播放器的头部 -->
+                        <div class="music-player__header" aria-live="polite">
+                            <div class="song-info">
+                                <div class="song-info__cover">
+                                    <img id="song-cover" src="images/default-cover.jpg" alt="封面图片">
+                                    <div class="cover-overlay"></div>
+                                </div>
+                                <div class="song-info__details">
+                                    <div id="current-song" class="song-info__title">选择一首歌曲开始播放</div>
+                                    <div id="current-artist" class="song-info__artist">音乐让生活更美好</div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <!-- 音乐播放器控制部分 -->
+                        <div class="music-player__controls">
+                            <nav class="music-player__controls-nav" aria-label="播放器控制">
+                                <!-- 随机播放按钮 -->
+                                <button class="button" id="random-button" aria-label="随机播放" role="button">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+                                    </svg>
+                                </button>
+                    
+                                <!-- 播放/暂停按钮 -->
+                                <button class="button button--play-pause" id="play-pause-button" aria-label="播放/暂停" role="button">
+                                    <svg id="play-icon" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <svg id="pause-icon" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="display: none;">
+                                        <path d="M6 6h4v12H6zm8 0h4v12h-4z"/>
+                                    </svg>
+                                </button>
+                    
+                                <!-- 下一首按钮 -->
+                                <button class="button" id="next-button" aria-label="下一首" role="button">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                                    </svg>  
+                                </button>
+                            </nav>
+                        </div>
+                    
+                        <!-- 进度条部分 -->
+                        <div class="progress-container">
+                            <div class="time-info">
+                                <span id="current-time">00:00</span>
+                                <span id="duration-info">
+                                    <span id="total-time">00:00</span>
+                                    <span id="vip-tag" class="vip-tag" style="display: none">VIP</span>
+                                </span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill"></div>
+                                <div class="progress-bar__thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 歌词容器优化 -->
+                    <div class="lyrics-container">
+                        <div class="lyrics-header">
+                            <span class="lyrics-title">歌词</span>
+                            <button class="lyrics-toggle" id="lyrics-toggle" aria-label="切换歌词">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="lyrics-content" id="lyrics">
+                            <p class="lyrics-line">暂无歌词</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推荐歌单优化 -->
+                <div class="recommendation-panel">
+                    <h3 class="panel-title">🎧 热门推荐</h3>
+                    <div class="recommendation-scroll">
+                        <div class="recommendation-list">
+                            <!-- 单个推荐项 -->
+                            <div class="recommendation-card">
+                                <div class="card-cover">
+                                    <img src="images/default-cover.jpg" alt="专辑封面">
+                                    <button class="play-button">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="card-info">
+                                    <h4 class="song-title">歌曲标题</h4>
+                                    <p class="song-artist">歌手名称</p>
+                                    <p class="song-album">《专辑名称》</p>
+                                    <div class="song-stats">
+                                        <span class="play-count">▶ 123万</span>
+                                        <span class="duration">3:45</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 重复7个推荐项 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer__content">
+            <div class="footer__links">
+                <a href="#" class="footer__link">关于我们</a>
+                <a href="#" class="footer__link">隐私政策</a>
+                <a href="#" class="footer__link">用户协议</a>
+            </div>
+            <p class="footer__copyright">&copy; 2024 音乐探索</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

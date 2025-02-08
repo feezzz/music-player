@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网易云音乐二维码登录</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    #qrCodeImg {
+      width: 200px;
+      height: 200px;
+      margin-bottom: 20px;
+    }
+    #status {
+      font-size: 18px;
+      color: #333;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>网易云音乐二维码登录</h1>
+  <div id="qrCodeContainer">
+    <img id="qrCodeImg" src="" alt="二维码">
+  </div>
+  <div id="status">正在生成二维码，请稍候...</div>
+  <button id="refreshBtn" style="display: none;">刷新二维码</button>
+
+  <script>
+    let key = null;
+    let qrCodeInterval = null;
+
+    // 获取二维码 key 和图片
+    const fetchQrCode = async () => {
+      try {
+        const keyResponse = await fetch('/api/getQrKey');
+        const keyData = await keyResponse.json();
+        key = keyData.key;
+
+        const qrCodeResponse = await fetch(`/api/getQrCode?key=${key}`);
+        const qrCodeData = await qrCodeResponse.json();
+        document.getElementById('qrCodeImg').src = qrCodeData.qrCode;
+        document.getElementById('status').innerText = '请使用网易云音乐APP扫描二维码登录';
+
+        // 开始轮询检查二维码状态
+        qrCodeInterval = setInterval(checkQrCodeStatus, 2000);
+      } catch (error) {
+        console.error('获取二维码失败：', error);
+        document.getElementById('status').innerText = '获取二维码失败，请重试';
+      }
+    };
+
+    // 检查二维码状态
+    const checkQrCodeStatus = async () => {
+      try {
+        const response = await fetch(`/api/checkQrCode?key=${key}`);
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          clearInterval(qrCodeInterval);
+          document.getElementById('status').innerText = '登录成功！';
+          alert('登录成功，cookie为：' + data.cookie);
+          // 这里可以将 cookie 保存起来，用于后续请求
+        } else if (data.status === 'confirm') {
+          document.getElementById('status').innerText = '请确认登录...';
+        } else if (data.status === 'waiting') {
+          document.getElementById('status').innerText = '等待扫码...';
+        } else if (data.status === 'expired') {
+          clearInterval(qrCodeInterval);
+          document.getElementById('status').innerText = '二维码已过期，请刷新二维码';
+          document.getElementById('refreshBtn').style.display = 'block';
+        } else {
+          document.getElementById('status').innerText = '检查二维码状态失败：' + data.message;
+        }
+      } catch (error) {
+        console.error('检查二维码状态失败：', error);
+        document.getElementById('status').innerText = '检查二维码状态失败，请重试';
+      }
+    };
+
+    // 刷新二维码
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      document.getElementById('refreshBtn').style.display = 'none';
+      fetchQrCode();
+    });
+
+    // 页面加载时获取二维码
+    fetchQrCode();
+  </script>
+</body>
+</html>
