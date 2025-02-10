@@ -1350,31 +1350,53 @@ body::before {
 .card-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .song-title {
-  font-size: 1rem;
-  margin-bottom: 4px;
-  color: rgba(255,255,255,0.9);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .song-artist {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 2px;
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.85);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.song-artist::before {
+  content: "🎤";
+  font-style: normal;
+  opacity: 0.7;
 }
 
 .song-album {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.song-album::before {
+  content: "💿";
+  font-size: 0.9em;
+  opacity: 0.6;
 }
 
 .song-stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.5);
+  display: none !important;
 }
 
 /* 响应式调整 */
@@ -1396,6 +1418,15 @@ body::before {
     .recommendation-cover {
         width: 70px;
         height: 70px;
+    }
+    .song-title {
+        font-size: 1rem;
+    }
+    .song-artist {
+        font-size: 0.85rem;
+    }
+    .song-album {
+        font-size: 0.8rem;
     }
 }
 
@@ -1469,18 +1500,20 @@ body::before {
 }
 
 .song-title {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 600;
     margin: 0 0 4px 0;
     color: var(--text-color);
+    letter-spacing: 0.3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .song-artist {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.92rem;
+    color: rgba(255,255,255,0.85);
+    font-style: italic;
     margin: 0 0 2px 0;
     white-space: nowrap;
     overflow: hidden;
@@ -1488,8 +1521,8 @@ body::before {
 }
 
 .song-album {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
     margin: 0 0 8px 0;
     white-space: nowrap;
     overflow: hidden;
@@ -1497,10 +1530,7 @@ body::before {
 }
 
 .song-stats {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
+    display: none !important;
 }
 
 /* 统一滚动条样式 */
@@ -1555,4 +1585,59 @@ body::before {
     overflow-x: hidden; /* 隐藏横向滚动 */
     max-height: 100%;  /* 继承父容器高度 */
     padding-right: 8px; /* 防止内容被遮挡 */
+}
+
+/* 加载动画 */
+.loader {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 骨架屏效果 */
+.skeleton-item {
+    height: 60px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton 1.5s infinite;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+@keyframes skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* 对应的CSS样式 */
+.error-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffe6e6;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
 }

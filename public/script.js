@@ -106,6 +106,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // 在获取数据前显示加载状态
+    function showLoading() {
+        const loader = document.createElement('div');
+        loader.className = 'loader';
+        loader.innerHTML = `
+            <div class="spinner"></div>
+            <p>正在加载音乐数据...</p>
+        `;
+        document.getElementById('music-list').appendChild(loader);
+    }
+
+    // 数据加载完成后隐藏
+    function hideLoading() {
+        const loader = document.querySelector('.loader');
+        if (loader) loader.remove();
+    }
+
+    // 添加请求超时处理
+    async function fetchWithTimeout(url, timeout = 8000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        
+        try {
+            const response = await fetch(url, {
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response.json();
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('请求超时，请检查网络连接');
+            }
+            throw error;
+        }
+    }
+
+    // 改进后的数据获取函数
+    async function loadData() {
+        try {
+            const [songs, playlists] = await Promise.all([
+                fetchWithTimeout('/api/songs'),
+                fetchWithTimeout('/api/playlists')
+            ]);
+            renderContent(songs, playlists);
+        } catch (error) {
+            showErrorMessage(error.message);
+        }
+    }
+
     // 从 API 获取歌曲列表
     fetch('/api/playlist')
         .then(response => response.json())
@@ -799,3 +848,15 @@ self.addEventListener('install', (event) => {
       ]))
   );
 });
+
+function showErrorMessage(msg) {
+    const errorBox = document.createElement('div');
+    errorBox.className = 'error-message';
+    errorBox.innerHTML = `
+        <div class="error-icon">⚠️</div>
+        <p>${msg}</p>
+        <button onclick="location.reload()">重新加载</button>
+    `;
+    document.body.appendChild(errorBox);
+}
+
